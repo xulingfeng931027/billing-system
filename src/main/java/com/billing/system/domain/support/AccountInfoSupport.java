@@ -3,6 +3,7 @@ package com.billing.system.domain.support;
 import com.billing.system.domain.entity.BaseComboInfo;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * @author xulingfeng
@@ -53,5 +54,12 @@ public interface AccountInfoSupport {
      */
     Integer queryRemainFreeTime(String number);
 
+    /**
+     * 查询套餐剩余免费分钟数
+     *
+     * @param number
+     * @return
+     */
+    List<String> queryFamilyNums(String number);
 
 }

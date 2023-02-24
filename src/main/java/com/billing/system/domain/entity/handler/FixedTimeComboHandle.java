@@ -30,15 +30,22 @@ public class FixedTimeComboHandle implements Handler {
             Integer remainFreeTime = accountInfoSupport.queryRemainFreeTime(context.getCalledNumber());
             //通话时长小于等于主加免费分钟数，通话费用为0，并扣减可使用的主叫免费分钟数
             if (lastTimeInterval <= remainFreeTime) {
-                context.getBillResult().setFreeMinutes(remainFreeTime - lastTimeInterval);
-                context.setStopFlag(true);
+                context.getCalledBillResult().setFreeMinutes(remainFreeTime - lastTimeInterval);
+                context.setLastTimeInterval(0);
                 return;
             }
             //免费时长不够用了
             context.setLastTimeInterval(lastTimeInterval - remainFreeTime);
-            context.getBillResult().setFreeMinutes(ZERO_MINUTE);
+            context.getCalledBillResult().setFreeMinutes(ZERO_MINUTE);
         } else {
-
+            Integer remainFreeTime = accountInfoSupport.queryRemainFreeTime(context.getCallingNumber());
+            if (lastTimeInterval <= remainFreeTime) {
+                context.getCallingBillResult().setFreeMinutes(remainFreeTime - lastTimeInterval);
+                context.setLastTimeInterval(0);
+                return;
+            }
+            context.setLastTimeInterval(lastTimeInterval - remainFreeTime);
+            context.getCallingBillResult().setFreeMinutes(ZERO_MINUTE);
         }
 
     }

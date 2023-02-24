@@ -10,7 +10,7 @@ public class BillResult {
     /**
      * 通话费用
      */
-    private BigDecimal cost;
+    private BigDecimal cost = BigDecimal.ZERO;
     /**
      * 扣除的免费分钟数
      */

@@ -27,10 +27,9 @@ public class HandleContext {
     private String calledNumber;
 
     private String callingNumber;
-    private boolean stopFlag;
-
     private CallTypeEnum callType;
 
-    private BillResult billResult;
+    private BillResult calledBillResult;
 
+    private BillResult callingBillResult;
 }
