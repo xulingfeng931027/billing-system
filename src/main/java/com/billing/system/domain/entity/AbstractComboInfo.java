@@ -1,5 +1,6 @@
 package com.billing.system.domain.entity;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -11,9 +12,7 @@ import java.math.BigDecimal;
  * @description 基础套餐
  * @date 2023/2
  */
-@Getter
-@SuperBuilder
-@NoArgsConstructor
+@Data
 public abstract class AbstractComboInfo {
     /**
      * 主叫每分钟费用
@@ -45,17 +44,4 @@ public abstract class AbstractComboInfo {
      * @param calledNumber        被叫号
      * @return
      */
-    public abstract BigDecimal computeCostForCalling(Integer totalTimeInterval, Integer lastTimeInterval, BigDecimal lastTimeCallingCost, String calledNumber);
-
-    /**
-     * 计算被叫费用
-     *
-     * @param totalTimeInterval  通话总时长
-     * @param lastTimeInterval   与上一次计费时间间隔（分钟）
-     * @param lastTimeCalledCost 与上一次被叫计费费用
-     * @param callingNumber      主叫号
-     * @return
-     */
-    public abstract BigDecimal computeCostForCalled(Integer totalTimeInterval, Integer lastTimeInterval, BigDecimal lastTimeCalledCost, String callingNumber);
-
 }

@@ -1,12 +1,18 @@
 package com.billing.system.domain.entity.handler;
 
 import com.billing.system.domain.entity.enumTypes.CallTypeEnum;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
 @Data
-public class HandleContext {
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class BillHandleContext {
 
     /**
      * 总时长
@@ -19,17 +25,16 @@ public class HandleContext {
     /**
      * 上一次计费的费用
      */
-    private BigDecimal lastTimeCallingCost = Handler.ZERO_COST;
-    /**
-     * 上一次计费的费用
-     */
-    private BigDecimal lastTimeCalledCost = Handler.ZERO_COST;
+    @Builder.Default
+    private BigDecimal lastTimeCost = BillHandler.ZERO_COST;
     private String calledNumber;
 
-    private String callingNumber;
+    private String callerNumber;
     private CallTypeEnum callType;
+    /**
+     * 扣除的免费分钟数
+     */
+    private Integer freeMinutes;
 
-    private BillResult calledBillResult;
 
-    private BillResult callingBillResult;
 }

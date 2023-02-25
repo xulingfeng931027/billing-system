@@ -24,9 +24,9 @@ public interface AccountInfoSupport {
      * 更新号码信息（比如固定时长套餐剩余免费分钟数（主叫与被叫））
      *
      * @param number
-     * @param comboInfo
+     * @param minutes
      */
-    void updateNumberInfo(String number, BaseComboInfo comboInfo);
+    void updateFixedTimeCombo(String number, Integer minutes);
 
     /**
      * 根据号码获取套餐信息

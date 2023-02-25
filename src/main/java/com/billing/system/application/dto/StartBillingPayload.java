@@ -19,7 +19,7 @@ public class StartBillingPayload {
     @ApiModelProperty("主叫号")
     @NotNull(message = "主叫号不能为空")
     @Pattern(regexp = "^(13[0-9]|14[5|7]|15[0|1|2|3|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])\\d{8}$", message = "主叫号格式不对")
-    private String callingNumber;
+    private String callerNumber;
 
     @ApiModelProperty("被叫号")
     @NotNull(message = "被叫号不能为空")

@@ -8,7 +8,7 @@ import java.math.BigDecimal;
  * @author 康康的远方
  * @date 2021/4/6
  */
-public interface Handler {
+public interface BillHandler {
 
     /**
      * 零费用
@@ -21,5 +21,5 @@ public interface Handler {
     Integer ZERO_MINUTE = Integer.parseInt("0");
 
 
-    void doHandler(HandleContext context);
+    void doHandler(BillHandleContext context);
 }

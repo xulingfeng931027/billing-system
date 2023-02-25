@@ -63,8 +63,6 @@ public class BillingRecord {
      */
     private BigDecimal calledCost;
 
-    private BaseComboInfo comboInfo;
-
 
     /**
      * 设置计费状态为开始计费

@@ -1,9 +1,8 @@
 package com.billing.system.domain.entity.handler;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
+import com.billing.system.domain.entity.enumTypes.CallTypeEnum;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -13,11 +12,9 @@ import java.math.BigDecimal;
  * @description 基础套餐
  * @date 2023/2
  */
-@Getter
-@SuperBuilder
-@NoArgsConstructor
 @Component("base")
-public class BaseComboInfoHandle implements Handler {
+@Order(2)
+public class BaseComboInfoHandle implements BillHandler {
 
     //也可从数据库中读取
     /**
@@ -34,11 +31,13 @@ public class BaseComboInfoHandle implements Handler {
 
 
     @Override
-    public void doHandler(HandleContext context) {
-        BigDecimal lastTimeCalledCost = context.getLastTimeCalledCost();
-        BigDecimal lastTimeCallingCost = context.getLastTimeCallingCost();
+    public void doHandler(BillHandleContext context) {
         Integer lastTimeInterval = context.getLastTimeInterval();
-        context.setLastTimeCallingCost(lastTimeCallingCost.add(callingCost.multiply(BigDecimal.valueOf(lastTimeInterval))));
-        context.setLastTimeCalledCost(lastTimeCalledCost.add(calledCost.multiply(BigDecimal.valueOf(lastTimeInterval))));
+        BigDecimal lastTimeCost = context.getLastTimeCost();
+        if (context.getCallType() == CallTypeEnum.CALLEDTYPE) {
+            context.setLastTimeCost(lastTimeCost.add(calledCost.multiply(BigDecimal.valueOf(lastTimeInterval))));
+        } else {
+            context.setLastTimeCost(lastTimeCost.add(callingCost.multiply(BigDecimal.valueOf(lastTimeInterval))));
+        }
     }
 }

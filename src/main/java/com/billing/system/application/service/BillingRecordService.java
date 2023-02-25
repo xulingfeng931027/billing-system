@@ -6,18 +6,20 @@ import com.billing.system.application.dto.EndBillingPayload;
 import com.billing.system.application.dto.StartBillingPayload;
 import com.billing.system.application.mapstruct.BillingRecordMapStruct;
 import com.billing.system.common.exception.ApiException;
-import com.billing.system.domain.entity.BaseComboInfo;
 import com.billing.system.domain.entity.BillingRecord;
 import com.billing.system.domain.entity.enumTypes.BillingStatusEnum;
 import com.billing.system.domain.entity.enumTypes.CallTypeEnum;
+import com.billing.system.domain.entity.handler.BillHandleContext;
+import com.billing.system.domain.entity.handler.BillHandler;
 import com.billing.system.domain.repository.BillingRecordRepository;
 import com.billing.system.domain.support.AccountInfoSupport;
+import com.billing.system.infrastructure.po.BillingRecordPO;
 import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -37,6 +39,8 @@ public class BillingRecordService {
 
     @Autowired
     private AccountInfoSupport accountInfoSupport;
+    @Autowired
+    private List<BillHandler> billHandlerList;
 
     /**
      * 开始计费
@@ -68,10 +72,7 @@ public class BillingRecordService {
      * @return
      */
     public BillingResponseDTO handleBilling(BillingPayload billingPayload) {
-        //根据计费id查询计费记录
-        BillingRecord billingRecord = BillingRecordMapStruct.INSTANCE.toEntity(billingPayload);
-
-        return BillingRecordMapStruct.INSTANCE.toDTO(handleBilling0(billingRecord, BillingStatusEnum.BILLING));
+        return BillingRecordMapStruct.INSTANCE.toDTO(handleBilling0(billingPayload, BillingStatusEnum.BILLING));
 
     }
 
@@ -97,30 +98,21 @@ public class BillingRecordService {
     /**
      * 计费步骤
      *
-     * @param billingRecord
      * @param billingStatus
      */
     @Transactional(rollbackFor = Exception.class)
-    public BillingRecord handleBilling0(BillingRecord billingRecord, BillingStatusEnum billingStatus) {
+    public BillingRecord handleBilling0(BillingPayload billingPayload, BillingStatusEnum billingStatus) {
 
         //验证计费记录是否存在
-        billingRecord = billingRecordRepository.getByRecordId(billingRecord.getId());
+        BillingRecord billingRecord = billingRecordRepository.getByRecordId(billingPayload.getRecordId());
         if (Objects.isNull(billingRecord)) {
             throw new ApiException("计费记录不存在");
         }
 
         //验证计费状态
-        boolean isStatusEnd = billingRecord.checkBillingStatusIsEnd();
-        if (isStatusEnd) {
+        if (billingRecord.checkBillingStatusIsEnd()) {
             throw new ApiException("计费已结束");
         }
-
-        //获取主叫号套餐信息
-        BaseComboInfo callingNumberComboInfo = accountInfoSupport.getByNumber(billingRecord.getCallerNumber());
-
-        //获取被叫号套餐信息
-
-        BaseComboInfo calledNumberComboInfo = accountInfoSupport.getByNumber(billingRecord.getCalledNumber());
 
         //修改最近计费时间为上一次计费结束时间
         billingRecord.modifyLatestBillingTime(billingRecord.getEndTime());
@@ -129,12 +121,15 @@ public class BillingRecordService {
         billingRecord.modifyBillingEnTime();
 
         //计算主叫号通话费用
-        BigDecimal callingCost = billing(billingRecord, callingNumberComboInfo, CallTypeEnum.CALLINGTYPE);
-        billingRecord.modifyCallingCost(callingCost);
+        BillHandleContext callingContext = billing(billingRecord, CallTypeEnum.CALLINGTYPE);
+        billingRecord.modifyCallingCost(callingContext.getLastTimeCost());
+        accountInfoSupport.updateFixedTimeCombo(billingRecord.getCallerNumber(),callingContext.getFreeMinutes());
+
 
         //计算被叫号通话费用
-        BigDecimal calledCost = billing(billingRecord, calledNumberComboInfo, CallTypeEnum.CALLEDTYPE);
-        billingRecord.modifyCalledCost(calledCost);
+        callingContext = billing(billingRecord, CallTypeEnum.CALLEDTYPE);
+        billingRecord.modifyCalledCost(callingContext.getLastTimeCost());
+        accountInfoSupport.updateFixedTimeCombo(billingRecord.getCalledNumber(),callingContext.getFreeMinutes());
 
         if (BillingStatusEnum.BILLING.equals(billingStatus)) {
             //修改计费状态为进行中
@@ -146,26 +141,17 @@ public class BillingRecordService {
 
         //更新计费记录
         billingRecordRepository.updateBillingRecord(billingRecord);
-
-        //通知账户系统，更新号码套餐内容，比如剩余免费主叫与被叫通话时长
-        accountInfoSupport.updateNumberInfo(billingRecord.getCallerNumber(), callingNumberComboInfo);
-        accountInfoSupport.updateNumberInfo(billingRecord.getCalledNumber(), calledNumberComboInfo);
         return billingRecord;
     }
 
-    private BigDecimal billing(BillingRecord billingRecord, BaseComboInfo comboInfo, CallTypeEnum callType) {
+    private BillHandleContext billing(BillingRecord billingRecord, CallTypeEnum callType) {
         Integer totalTimeInterval = billingRecord.calculationTimeIntervalOfMinutes();
         Integer lastTimeInterval = billingRecord.calculationTimeIntervalOfMinutesForLastTime();
-
-        if (CallTypeEnum.CALLINGTYPE.equals(callType)) {
-            BigDecimal callingCost = comboInfo.computeCostForCalling(totalTimeInterval, lastTimeInterval, billingRecord.getCallerCost(), billingRecord.getCalledNumber());
-            return callingCost;
-        } else if (CallTypeEnum.CALLEDTYPE.equals(callType)) {
-            BigDecimal calledCost = comboInfo.computeCostForCalled(totalTimeInterval, lastTimeInterval, billingRecord.getCalledCost(), billingRecord.getCallerNumber());
-            return calledCost;
-        } else {
-            throw new ApiException("不支持通话类型");
+        BillHandleContext context = BillHandleContext.builder().callType(callType).calledNumber(billingRecord.getCalledNumber()).callerNumber(billingRecord.getCallerNumber()).lastTimeInterval(lastTimeInterval).totalTimeInterval(totalTimeInterval).build();
+        for (BillHandler billHandler : billHandlerList) {
+            billHandler.doHandler(context);
         }
+        return context;
     }
 
 

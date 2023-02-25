@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * @author xulingfeng
@@ -29,7 +30,7 @@ public class AccountInfoSupportImpl implements AccountInfoSupport {
     }
 
     @Override
-    public void updateNumberInfo(String number, BaseComboInfo comboInfo) {
+    public void updateFixedTimeCombo(String number, Integer minutes) {
         //模拟调用账户系统更新信息
     }
 
@@ -47,6 +48,11 @@ public class AccountInfoSupportImpl implements AccountInfoSupport {
 
     @Override
     public Integer queryRemainFreeTime(String number) {
+        return null;
+    }
+
+    @Override
+    public List<String> queryFamilyNums(String number) {
         return null;
     }
 }

@@ -21,7 +21,7 @@ public interface BillingRecordMapStruct {
     BillingRecordMapStruct INSTANCE = Mappers.getMapper(BillingRecordMapStruct.class);
 
     @Mappings({
-            @Mapping(source = "callingNumber", target = "callingNumber", resultType = String.class),
+            @Mapping(source = "callerNumber", target = "callerNumber", resultType = String.class),
             @Mapping(source = "calledNumber", target = "calledNumber", resultType = String.class)
     })
     BillingRecord toEntity(StartBillingPayload startBillingPayload);
@@ -30,6 +30,6 @@ public interface BillingRecordMapStruct {
 
     BillingRecord toEntity(EndBillingPayload endBillingPayload);
 
-    @Mapping(source = "billingRecordEntity.recordId.id", target = "recordId", resultType = String.class)
+    @Mapping(source = "id", target = "recordId", resultType = String.class)
     BillingResponseDTO toDTO(BillingRecord billingRecord);
 }

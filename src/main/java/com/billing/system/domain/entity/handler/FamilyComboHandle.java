@@ -1,11 +1,9 @@
 package com.billing.system.domain.entity.handler;
 
 import com.billing.system.domain.support.AccountInfoSupport;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -15,22 +13,20 @@ import java.util.List;
  * @description 固定时长套餐
  * @date 2023/2
  */
-@Getter
-@SuperBuilder
-@NoArgsConstructor
 @Component("fixedTime")
 @Slf4j
-public class FamilyComboHandle implements Handler {
+@Order(0)
+public class FamilyComboHandle implements BillHandler {
 
     @Autowired
     private AccountInfoSupport accountInfoSupport;
 
 
     @Override
-    public void doHandler(HandleContext context) {
-        List<String> familyNums = accountInfoSupport.queryFamilyNums(context.getCallingNumber());
+    public void doHandler(BillHandleContext context) {
+        List<String> familyNums = accountInfoSupport.queryFamilyNums(context.getCallerNumber());
         if (familyNums.contains(context.getCalledNumber())) {
-            //说明是亲情号
+            //说明是亲情号 直接计费为0
             context.setLastTimeInterval(0);
         }
 
