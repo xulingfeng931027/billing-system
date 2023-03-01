@@ -1,9 +1,7 @@
 package com.billing.system.application.mapstruct;
 
 import com.billing.system.application.dto.BillingResponseDTO;
-import com.billing.system.application.dto.EndBillingPayload;
-import com.billing.system.application.dto.BillingPayload;
-import com.billing.system.application.dto.StartBillingPayload;
+import com.billing.system.application.payload.StartBillingPayload;
 import com.billing.system.domain.entity.BillingRecord;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -26,9 +24,6 @@ public interface BillingRecordMapStruct {
     })
     BillingRecord toEntity(StartBillingPayload startBillingPayload);
 
-    BillingRecord toEntity(BillingPayload billingPayload);
-
-    BillingRecord toEntity(EndBillingPayload endBillingPayload);
 
     @Mapping(source = "id", target = "recordId", resultType = String.class)
     BillingResponseDTO toDTO(BillingRecord billingRecord);

@@ -1,6 +1,8 @@
 package com.billing.system.adapter.web;
 
 import com.billing.system.application.dto.*;
+import com.billing.system.application.payload.BillingPayload;
+import com.billing.system.application.payload.StartBillingPayload;
 import com.billing.system.application.service.BillingRecordService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -29,18 +31,19 @@ public class BillingController {
 
     /**
      * 开始计费
+     *
      * @param startBillingPayload
      * @return
      */
     @ApiOperation("开始计费")
     public ResponseDTO<BillingResponseDTO> startBilling(@Valid @RequestBody StartBillingPayload startBillingPayload) {
         BillingResponseDTO billingResponseDTO = billingRecordService.startBilling(startBillingPayload);
-        // STD: 统一返回数据结构的封装 在用户接口层
         return new ResponseDTO(ResponseDTO.Status.SUCCESS, billingResponseDTO);
     }
 
     /**
      * 计费
+     *
      * @param billingPayload
      * @return
      */
@@ -53,16 +56,16 @@ public class BillingController {
 
     /**
      * 结束计费
+     *
      * @param endBillingPayload
      * @return
      */
     @ApiOperation("结束计费")
     @PostMapping(value = "/end", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseDTO<BillingResponseDTO> endBilling(@Valid @RequestBody EndBillingPayload endBillingPayload) {
+    public ResponseDTO<BillingResponseDTO> endBilling(@Valid @RequestBody BillingPayload endBillingPayload) {
         BillingResponseDTO billingResponseDTO = billingRecordService.endBilling(endBillingPayload);
         return new ResponseDTO(ResponseDTO.Status.SUCCESS, billingResponseDTO);
     }
-
 
 
 }

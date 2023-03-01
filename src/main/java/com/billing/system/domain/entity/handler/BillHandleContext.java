@@ -8,6 +8,11 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
+/**
+ * @author xulingfeng
+ * @Description  计费信息上下文
+ * @date 2023/2
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

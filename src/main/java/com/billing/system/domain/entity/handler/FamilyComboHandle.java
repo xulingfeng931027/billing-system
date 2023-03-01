@@ -9,8 +9,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 /**
- * @author xulingfeng
- * @description 固定时长套餐
+ * @author xulingfeng * @description 亲情套餐
  * @date 2023/2
  */
 @Component("fixedTime")

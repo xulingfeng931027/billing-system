@@ -1,4 +1,4 @@
-package com.billing.system.application.dto;
+package com.billing.system.application.payload;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;

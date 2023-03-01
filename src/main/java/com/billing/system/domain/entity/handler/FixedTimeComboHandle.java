@@ -32,12 +32,12 @@ public class FixedTimeComboHandle implements BillHandler {
         //通话时长小于等于主加免费分钟数，通话费用为0，并扣减可使用的主叫免费分钟数
         //免费时长不够用了
         if (lastTimeInterval <= remainFreeTime) {
-            context.getBillResult().setFreeMinutes(remainFreeTime - lastTimeInterval);
+            context.setFreeMinutes(remainFreeTime - lastTimeInterval);
             context.setLastTimeInterval(0);
             return;
         }
         context.setLastTimeInterval(lastTimeInterval - remainFreeTime);
-        context.getBillResult().setFreeMinutes(ZERO_MINUTE);
+        context.setFreeMinutes(ZERO_MINUTE);
 
     }
 }

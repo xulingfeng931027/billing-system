@@ -3,10 +3,9 @@ package com.billing.system.domain.entity.handler;
 import java.math.BigDecimal;
 
 /**
- * 抽象处理者
- *
- * @author 康康的远方
- * @date 2021/4/6
+ * @author xulingfeng
+ * @Description  计费处理器
+ * @date 2023/2
  */
 public interface BillHandler {
 

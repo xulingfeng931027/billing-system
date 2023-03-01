@@ -1,9 +1,8 @@
 package com.billing.system.application.service;
 
-import com.billing.system.application.dto.BillingPayload;
+import com.billing.system.application.payload.BillingPayload;
 import com.billing.system.application.dto.BillingResponseDTO;
-import com.billing.system.application.dto.EndBillingPayload;
-import com.billing.system.application.dto.StartBillingPayload;
+import com.billing.system.application.payload.StartBillingPayload;
 import com.billing.system.application.mapstruct.BillingRecordMapStruct;
 import com.billing.system.common.exception.ApiException;
 import com.billing.system.domain.entity.BillingRecord;
@@ -13,7 +12,6 @@ import com.billing.system.domain.entity.handler.BillHandleContext;
 import com.billing.system.domain.entity.handler.BillHandler;
 import com.billing.system.domain.repository.BillingRecordRepository;
 import com.billing.system.domain.support.AccountInfoSupport;
-import com.billing.system.infrastructure.po.BillingRecordPO;
 import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -82,11 +80,9 @@ public class BillingRecordService {
      * @param endBillingPayload
      * @return
      */
-    public BillingResponseDTO endBilling(EndBillingPayload endBillingPayload) {
-        BillingRecord billingRecord = BillingRecordMapStruct.INSTANCE.toEntity(endBillingPayload);
+    public BillingResponseDTO endBilling(BillingPayload endBillingPayload) {
 
-        //计费， AopContext解决同类中方法调用切面切不到问题
-        billingRecord = ((BillingRecordService) AopContext.currentProxy()).handleBilling0(billingRecord, BillingStatusEnum.END);
+        BillingRecord billingRecord = ((BillingRecordService) AopContext.currentProxy()).handleBilling0(endBillingPayload, BillingStatusEnum.END);
 
         //扣减费用
         accountInfoSupport.debitCost(billingRecord.getCallerNumber(), billingRecord.getCallerCost(),
@@ -123,13 +119,13 @@ public class BillingRecordService {
         //计算主叫号通话费用
         BillHandleContext callingContext = billing(billingRecord, CallTypeEnum.CALLINGTYPE);
         billingRecord.modifyCallingCost(callingContext.getLastTimeCost());
-        accountInfoSupport.updateFixedTimeCombo(billingRecord.getCallerNumber(),callingContext.getFreeMinutes());
+        accountInfoSupport.updateFixedTimeCombo(billingRecord.getCallerNumber(), callingContext.getFreeMinutes());
 
 
         //计算被叫号通话费用
         callingContext = billing(billingRecord, CallTypeEnum.CALLEDTYPE);
         billingRecord.modifyCalledCost(callingContext.getLastTimeCost());
-        accountInfoSupport.updateFixedTimeCombo(billingRecord.getCalledNumber(),callingContext.getFreeMinutes());
+        accountInfoSupport.updateFixedTimeCombo(billingRecord.getCalledNumber(), callingContext.getFreeMinutes());
 
         if (BillingStatusEnum.BILLING.equals(billingStatus)) {
             //修改计费状态为进行中
