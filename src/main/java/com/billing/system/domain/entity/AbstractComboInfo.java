@@ -1,9 +1,6 @@
 package com.billing.system.domain.entity;
 
 import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
 
@@ -35,13 +32,4 @@ public abstract class AbstractComboInfo {
      */
     Integer ZERO_MINUTE = Integer.parseInt("0");
 
-    /**
-     * 计算主叫费用
-     *
-     * @param totalTimeInterval   通话总时长
-     * @param lastTimeInterval    与上一次计费时间间隔（分钟）
-     * @param lastTimeCallingCost 与上一次主叫计费费用
-     * @param calledNumber        被叫号
-     * @return
-     */
 }
